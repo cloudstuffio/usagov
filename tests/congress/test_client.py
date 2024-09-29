@@ -1,4 +1,4 @@
-import pytest  # type: ignore
+import pytest
 from src.usagov.congress.client import Client
 from src.usagov.congress.services.amendment import AmendmentService
 from src.usagov.congress.services.bill import BillService

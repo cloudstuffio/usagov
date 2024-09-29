@@ -162,3 +162,50 @@ def test_bill_service_invalid_response(
     # Call the bill method and expect an HTTP error
     with pytest.raises(requests.exceptions.HTTPError):
         bill_service.bill(bill="123", bill_type="hr", congress=117)
+
+
+@patch("requests.get")
+def test_bill_service_bill_filter_parameters(
+    mock_get: Mock, bill_service: BillService
+) -> None:
+    """
+    Test the bill method to ensure it correctly filters parameters.
+
+    Args:
+        mock_get (Mock): Mocked requests.get method.
+        bill_service (BillService): The BillService instance.
+    """
+    # Mock response data
+    mock_response = Mock()
+    expected_json = {"data": "filtered_parameters_test"}
+    mock_response.json.return_value = expected_json
+    mock_response.status_code = 200
+    mock_get.return_value = mock_response
+
+    # Call the bill method with parameters, including some None values
+    response = bill_service.bill(
+        bill="123",
+        bill_type="hr",
+        congress=117,
+        limit=10,
+        from_datetime=None,
+        to_datetime=None,
+        sort=None,
+    )
+
+    # Constructed URL and params expected in the GET request
+    expected_url = "https://api.congress.gov/v3/bill/117/hr/123"
+    expected_params = {"limit": 10}  # None values should be filtered out
+
+    # Print the actual call arguments for debugging
+    print(f"Actual call args: {mock_get.call_args}")
+
+    # Assertions to ensure the request was made correctly
+    mock_get.assert_called_once_with(
+        expected_url,
+        headers={"X-API-Key": "test_api_key"},
+        params=expected_params,
+    )
+
+    # Assert the response data
+    assert response == expected_json
