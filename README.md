@@ -4,7 +4,7 @@
 
 version: 0.1.0
 
-Badges:
+Badges
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/usagov)
 
