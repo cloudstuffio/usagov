@@ -22,6 +22,7 @@ requests = "^2.32.0"
 [tool.poetry.group.dev.dependencies]
 mypy           = "^1.11.2"
 types-requests = "^2.32.0"
+pytest = "^8.3.3"
 
 [[tool.poetry_bumpversion.replacements]]
 files   = ["src/usagov/__version__.py", "tests/__version__.py"]
