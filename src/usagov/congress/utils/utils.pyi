@@ -1,0 +1,3 @@
+from typing import Any, Dict
+
+def filter_parameters(parameters: Dict[str, Any]) -> Dict[str, Any]: ...
