@@ -1,23 +1,52 @@
 name: Release
 on:
-    push:
+    pull_request:
         branches:
             - release
+        types:
+            - closed
+    push:
+        branches:
+            - main
+env:
+    PYTHON_VERSION: "3.12"
+    POETRY_VERSION: "1.8.3"
+    OS_NAME: "ubuntu-latest"
 
 jobs:
+    test:
+        runs-on: ubuntu-latest
+        if: >
+            github.event_name == 'push' && github.ref == 'refs/heads/main' ||
+            (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.ref == 'refs/heads/release')
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Set up Python ${{ env.PYTHON_VERSION }}
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+            - name: Install Poetry ${{ env.POETRY_VERSION }}
+              uses: abatilo/actions-poetry@v3.0.0
+              with:
+                  poetry-version: ${{ env.POETRY_VERSION }}
+            - name: Install dependencies
+              run: poetry install
+            - name: Run tests
+              run: poetry run pytest --cov=tests/ --cov-report=xml
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v4
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     publish:
-        strategy:
-            fail-fast: false
-            matrix:
-                python-version: ["3.12"]
-                poetry-version: ["1.8.3"]
-                os: [ubuntu-latest]
-        runs-on: ${{ matrix.os }}
+        needs: test
+        runs-on: ubuntu-latest
+        if: >
+            github.event_name == 'pull_request' && 
+            github.event.pull_request.merged == true && 
+            github.ref == 'refs/heads/release'
         steps:
             - uses: actions/checkout@v4
-            # - uses: actions/setup-python@v5
-            #   with:
-            #       python-version: ${{ matrix.python-version }}
             - name: Build and publish to pypi
               uses: JRubics/poetry-publish@v2.0
               with:
