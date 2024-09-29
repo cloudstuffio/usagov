@@ -5,7 +5,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python",
 ]
-description = "Python Interface for US Government APIs"
+description = "Python Interface for USA Government Data."
 documentation = "https://github.com/cloudstuffio/usagov"
 homepage = "https://github.com/cloudstuffio/usagov"
 keywords = ["congress", "gov", "usa", "usagov"]
@@ -22,6 +22,16 @@ requests = "^2.32.0"
 [tool.poetry.group.dev.dependencies]
 mypy           = "^1.11.2"
 types-requests = "^2.32.0"
+
+[[tool.poetry_bumpversion.replacements]]
+files   = ["src/usagov/__version__.py", "tests/__version__.py"]
+replace = '__version__ = "{new_version}"'
+search  = '__version__ = "{current_version}"'
+
+[[tool.poetry_bumpversion.replacements]]
+files   = ["README.md"]
+replace = 'version: {new_version}'
+search  = 'version: {current_version}'
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
